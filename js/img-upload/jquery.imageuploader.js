@@ -119,42 +119,94 @@
                 var removeLink = $('<span class="uploader__file-list__button"><button class="uploader__icon-button js-upload-remove-button fa fa-times" data-index="' + id + '"><svg t="1608397063323" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6214" width="32" height="32"><path d="M733.696 791.552c0 26.624-21.504 48.128-48.128 48.128H338.432c-26.624 0-48.128-21.504-48.128-48.128V280.064h443.904v511.488zM386.56 193.536c0-5.632 4.096-9.728 9.728-9.728h231.936c5.632 0 9.728 4.096 9.728 9.728v29.184H386.56v-29.184z m492.032 29.184h-182.784v-29.184c0-36.864-30.208-67.584-67.584-67.584H396.288c-36.864 0-67.584 30.208-67.584 67.584v29.184H145.408c-15.872 0-29.184 12.8-29.184 29.184 0 15.872 12.8 29.184 29.184 29.184h86.528v510.976c0 58.88 47.616 106.496 106.496 106.496h347.136c58.88 0 106.496-47.616 106.496-106.496v-512h86.528c15.872 0 29.184-12.8 29.184-29.184s-13.312-28.16-29.184-28.16zM512 752.64c15.872 0 29.184-12.8 29.184-29.184V414.72c0-15.872-12.8-29.184-29.184-29.184s-29.184 12.8-29.184 29.184v308.736c0 16.384 13.312 29.184 29.184 29.184m-135.168 0c15.872 0 29.184-12.8 29.184-29.184V414.72c0-15.872-12.8-29.184-29.184-29.184-15.872 0-29.184 12.8-29.184 29.184v308.736c0.512 16.384 13.312 29.184 29.184 29.184m270.336 0c15.872 0 29.184-12.8 29.184-29.184V414.72c0-15.872-12.8-29.184-29.184-29.184s-29.184 12.8-29.184 29.184v308.736c0.512 16.384 13.312 29.184 29.184 29.184" p-id="6215"></path></svg></button></span>');
                 var progress = $('<span class="uploader__file-list__thumbnail progress"></span>');
                 var link = $('<span class="uploader__file-list__thumbnail link"></span>');
-                // validate the file
-                if (options.fileTypeWhiteList.indexOf(getExtension(file.name).toLowerCase()) !== -1) {
-                    // file is ok, add it to the batch
-                    state.fileBatch.push({file: file, id: id, fileName: fileName, fileSize: fileSize});
-                    sizeWrapper = $('<span class="uploader__file-list__size">' + formatBytes(fileSize) + '</span>');
-                } else {
-                    // file is not ok, only add it to the dom
-                    sizeWrapper = $('<span class="uploader__file-list__size"><span class="uploader__error">' + options.badFileTypeMessage + '</span></span>');
+
+                const processFile = async () => {
+                    let result = await new Promise((resolve, reject) => {
+                            let reader = new FileReader();
+                            reader.onloadend = function () {
+                                thumbnail.attr('src', reader.result);
+                                thumbnail.parent().find('i').remove();
+                                const formatMap = {
+                                    '/9j/': 'jpg',
+                                    'R0lGO': 'gif',
+                                    'iVBORw': 'png'
+                                }
+                                var base64Str = reader.result.split(",")[1];
+                                let header_str = base64Str.substring(0, 10)
+                                let format_key = Object.keys(formatMap).find(ele => header_str.indexOf(ele) == 0)
+                                const format = formatMap[format_key];
+                                if (!format) {
+                                    console.log('只支持上传JPG、PNG或GIF图片');
+                                    resolve({'error': '只支持上传JPG、PNG或GIF图片'})
+                                    return
+                                }
+                                resolve({'base64': reader.result, 'format': format})
+                            };
+                            reader.onerror = function () {
+                                thumbnail.remove();
+                                resolve({'error': '图片读取出错了'})
+                            };
+                            reader.readAsDataURL(file);
+                        })
+                    let error = result['error']
+                    if (!error) {
+                        // file is ok, add it to the batch
+                        state.fileBatch.push({file: file, id: id, fileName: fileName, fileSize: fileSize, base64: result['base64'], format: result['format']});
+                        sizeWrapper = $('<span class="uploader__file-list__size">' + formatBytes(fileSize) + '</span>');
+                    } else {
+                         // file is not ok, only add it to the dom
+                        sizeWrapper = $('<span class="uploader__file-list__size"><span class="uploader__error">' + error + '</span></span>');
+                    }
+                    thumbnailContainer.append(thumbnail);
+                    listItem.append(thumbnailContainer);
+
+                    listItem
+                        .append(fileNameWrapper)
+                        .append(sizeWrapper)
+                        .append(progress)
+                        .append(link)
+                        .append(removeLink);
+                    dom.fileList.append(listItem);
+                    renderControls()
                 }
+                processFile()
+
+                // validate the file
+                // if (options.fileTypeWhiteList.indexOf(getExtension(file.name).toLowerCase()) !== -1) {
+                //     // file is ok, add it to the batch
+                //     state.fileBatch.push({file: file, id: id, fileName: fileName, fileSize: fileSize});
+                //     sizeWrapper = $('<span class="uploader__file-list__size">' + formatBytes(fileSize) + '</span>');
+                // } else {
+                //     // file is not ok, only add it to the dom
+                //     sizeWrapper = $('<span class="uploader__file-list__size"><span class="uploader__error">' + options.badFileTypeMessage + '</span></span>');
+                // }
 
                 // create the thumbnail, if you can
-                if (window.FileReader && file.type.indexOf('image') !== -1) {
-                    var reader = new FileReader();
-                    reader.onloadend = function () {
-                        thumbnail.attr('src', reader.result);
-                        thumbnail.parent().find('i').remove();
-                    };
-                    reader.onerror = function () {
-                        thumbnail.remove();
-                    };
-                    reader.readAsDataURL(file);
-                } else if (file.type.indexOf('image') === -1) {
-                    thumbnail = $('<i class="fa fa-file-o uploader__icon">');
-                }
+                // if (window.FileReader && file.type.indexOf('image') !== -1) {
+                //     var reader = new FileReader();
+                //     reader.onloadend = function () {
+                //         thumbnail.attr('src', reader.result);
+                //         thumbnail.parent().find('i').remove();
+                //     };
+                //     reader.onerror = function () {
+                //         thumbnail.remove();
+                //     };
+                //     reader.readAsDataURL(file);
+                // } else if (file.type.indexOf('image') === -1) {
+                //     thumbnail = $('<i class="fa fa-file-o uploader__icon">');
+                // }
 
-                thumbnailContainer.append(thumbnail);
-                listItem.append(thumbnailContainer);
+                // thumbnailContainer.append(thumbnail);
+                // listItem.append(thumbnailContainer);
 
-                listItem
-                    .append(fileNameWrapper)
-                    .append(sizeWrapper)
-                    .append(progress)
-                    .append(link)
-                    .append(removeLink);
+                // listItem
+                //     .append(fileNameWrapper)
+                //     .append(sizeWrapper)
+                //     .append(progress)
+                //     .append(link)
+                //     .append(removeLink);
 
-                dom.fileList.append(listItem);
+                // dom.fileList.append(listItem);
             }
 
             function getExtension (path) {
@@ -184,7 +236,8 @@
 
             function uploadSubmitHandler () {
                 if (options.uploadFiles) {
-                    options.uploadFiles(state.fileBatch);
+                    let preparedFiles = state.fileBatch.filter(file => file['base64'] && !file['uploaded']);
+                    options.uploadFiles(preparedFiles);
                     return;
                 }
                 if (state.fileBatch.length !== 0) {
@@ -235,13 +288,12 @@
                 e.preventDefault();
 
                 if (!state.isUploading) {
-                    var removeIndex = $(e.target).data('index');
-                    removeItem(removeIndex);
                     let target  = e.target;
                     while(target && target.tagName.toLowerCase() != 'li') {
                         target = target.parentNode;
                     }
-                    // $(e.target).parent().remove();
+                    var removeIndex = $(target).data('index');
+                    removeItem(removeIndex);
                     $(target).remove();
                 }
 
