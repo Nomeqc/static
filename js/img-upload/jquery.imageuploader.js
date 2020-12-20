@@ -109,7 +109,7 @@
                 var fileSize = file.size;
                 var id = state.listIndex;
                 var sizeWrapper;
-                var fileNameWrapper = $('<span class="uploader__file-list__text">' + fileName + '</span>');
+                var fileNameWrapper = $(`<span class="uploader__file-list__text"><span style="word-break: break-all; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; text-overflow: ellipsis;">${fileName}</span></span>`);
 
                 state.listIndex++;
 
