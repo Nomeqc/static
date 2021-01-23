@@ -99,5 +99,6 @@ videojs.addLanguage('zh-Hans', {
     "Link": "链接",
     "Social": "社交",
     "Embed": "嵌入",
-    "Advertisement": "广告"
+    "Advertisement": "广告",
+    "Normal": "正常"
 });
