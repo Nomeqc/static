@@ -1,0 +1,42 @@
+[
+    {
+        "name": "Sample-jpg-image-50kb.jpg",
+        "link": "https://static.dingtalk.com/media/lADPD4PvM2rRgqHNASzNASw_300_300.jpg"
+    },
+    {
+        "name": "Sample-jpg-image-100kb.jpg",
+        "link": "https://static.dingtalk.com/media/lADPD4d8sg-aRb_NArHNArE_689_689.jpg"
+    },
+    {
+        "name": "Sample-jpg-image-200kb.jpg",
+        "link": "https://static.dingtalk.com/media/lADPD3IrujLx76XNBAzNBAw_1036_1036.jpg"
+    },
+    {
+        "name": "Sample-jpg-image-500kb.jpg",
+        "link": "https://static.dingtalk.com/media/lADPD4d8sg-X15bNBwDNBwA_1792_1792.jpg"
+    },
+    {
+        "name": "Sample-jpg-image-1mb.jpg",
+        "link": "https://static.dingtalk.com/media/lADPD26eO44sgFnNC2nNCJA_2192_2921.jpg"
+    },
+    {
+        "name": "Sample-jpg-image-2mb.jpg",
+        "link": "https://static.dingtalk.com/media/lADPDgQ9xecU7DvNEMPNDJI_3218_4291.jpg"
+    },
+    {
+        "name": "Sample-jpg-image-5mb.jpg",
+        "link": "https://static.dingtalk.com/media/lADPDgfLRIvab27NGmnNE9A_5072_6761.jpg"
+    },
+    {
+        "name": "Sample-jpg-image-10mb.jpg",
+        "link": "https://static.dingtalk.com/media/lADPDgQ9xecU3M7NFBzNHiw_7724_5148.jpg"
+    },
+    {
+        "name": "Sample-jpg-image-20mb.jpg",
+        "link": "https://static.dingtalk.com/media/lADPDg7mQdVopuXNEL_NKf8_10751_4287.jpg"
+    },
+    {
+        "name": "Sample-jpg-image-30mb.jpg",
+        "link": "https://static.dingtalk.com/media/lADPD3zUNiFG0cnNFSnNNQ8_13583_5417.jpg"
+    }
+]
