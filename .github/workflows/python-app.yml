@@ -14,6 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
@@ -29,10 +31,5 @@ jobs:
         git config --global user.email nomeqc@gmail.com
         git config --global user.name Fallrainy
         git add .
-        git commit -m "update" -a
-
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-
+        git commit -m "update"
+        git push
